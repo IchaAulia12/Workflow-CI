@@ -36,7 +36,7 @@ jobs:
       with:
         name: model
         path: MLProject/artifacts/model.pkl
-
+      continue-on-error: true # Optional: Allows the workflow to continue even if this step fails temporarily
     - name: Build Docker image
       run: docker build -t ichaaulia/student-passed-classifier:latest MLProject
 
