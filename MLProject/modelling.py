@@ -91,5 +91,5 @@ for n in params:
 
         mlflow.sklearn.log_model(model, "model_rf")
 
-os.makedirs("artifacts", exist_ok=True)
-joblib.dump(model, "artifacts/model.pkl")
+        os.makedirs("artifacts", exist_ok=True)
+        joblib.dump(model, "artifacts/model.pkl")
