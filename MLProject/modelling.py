@@ -31,7 +31,7 @@ os.environ["MLFLOW_TRACKING_PASSWORD"] = os.environ["MLFLOW_TRACKING_PASSWORD"]
 mlflow.set_experiment("student-passed-classifier")
 
 
-df = pd.read_csv('StudentsPerformance.csv')
+df = pd.read_csv('StudentsPerformance_cleaned.csv')
 
 df['passed'] = ((df['math score'] >= 50) &
                 (df['reading score'] >= 50) &
