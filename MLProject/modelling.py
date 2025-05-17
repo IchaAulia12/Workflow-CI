@@ -12,7 +12,7 @@ import pandas as pd
 import os
 import matplotlib.pyplot as plt
 import seaborn as sns
-
+import joblib
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import (
@@ -90,3 +90,6 @@ for n in params:
         mlflow.log_metric("recall_1", report["1"]["recall"])
 
         mlflow.sklearn.log_model(model, "model_rf")
+
+os.makedirs("artifacts", exist_ok=True)
+joblib.dump(model, "artifacts/model.pkl")
