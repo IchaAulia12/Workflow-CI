@@ -26,7 +26,7 @@ from sklearn.metrics import (
 )
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--data_path", type=str, default="data/StudentsPerformance_cleaned.csv")
+parser.add_argument("--data_path", type=str, default="./StudentsPerformance_cleaned.csv")
 args = parser.parse_args()
 
 mlflow.set_tracking_uri(os.environ['MLFLOW_TRACKING_URI'])
