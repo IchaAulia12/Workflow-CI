@@ -10,6 +10,7 @@ import mlflow
 import mlflow.sklearn
 import pandas as pd
 import os
+import argparse
 import matplotlib.pyplot as plt
 import seaborn as sns
 import joblib
@@ -24,18 +25,16 @@ from sklearn.metrics import (
     confusion_matrix,
 )
 
+parser = argparse.ArgumentParser()
+parser.add_argument("--data_path", type=str, default="data/StudentsPerformance_cleaned.csv")
+args = parser.parse_args()
 
 mlflow.set_tracking_uri(os.environ['MLFLOW_TRACKING_URI'])
 os.environ["MLFLOW_TRACKING_USERNAME"] = os.environ["MLFLOW_TRACKING_USERNAME"]
 os.environ["MLFLOW_TRACKING_PASSWORD"] = os.environ["MLFLOW_TRACKING_PASSWORD"]
 mlflow.set_experiment("student-passed-classifier")
 
-
-df = pd.read_csv('StudentsPerformance_cleaned.csv')
-
-df['passed'] = ((df['math score'] >= 50) &
-                (df['reading score'] >= 50) &
-                (df['writing score'] >= 50)).astype(int)
+df = pd.read_csv(args.data_path)
 
 X = df.drop(columns=['math score', 'reading score', 'writing score', 'passed'])
 y = df['passed']
