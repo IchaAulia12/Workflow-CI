@@ -85,7 +85,7 @@ jobs:
       run: docker tag ichaaulia720/student-passed-classifier:latest ichaaulia/student-passed-classifier:latest
 
     - name: Push Docker Image
-      run: docker push ichaaulia720/student-passed-classifier:latest
+      run: docker push ichaaulia/student-passed-classifier:latest
 
     - name: Post setup
       run: echo "CI pipeline completed successfully 🎉"
