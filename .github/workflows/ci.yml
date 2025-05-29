@@ -18,7 +18,7 @@ jobs:
     steps:
     - name: Checkout CI repo
       uses: actions/checkout@v3
-      with:
+    
     - name: Checkout preprocessing repo
       uses: actions/checkout@v3
       with:
