@@ -18,7 +18,7 @@ from sklearn.metrics import (
 )
 
 
-def main():
+def main(data_path):
     # Setup MLflow URI dan Auth dari environment variable (tidak interaktif)
     mlflow.set_tracking_uri(os.environ.get('MLFLOW_TRACKING_URI', 'http://localhost:5000'))
     mlflow.set_experiment("student-passed-classifier")
