@@ -46,7 +46,7 @@ jobs:
         conda activate mlproject-env
         mlflow run . \
           --entry-point main \
-          -P data_path="data/StudentsPerformance_cleaned.csv"
+          -P data_path="./StudentsPerformance_cleaned.csv"
 
     - name: Get latest MLflow run_id
       id: get_run_id
