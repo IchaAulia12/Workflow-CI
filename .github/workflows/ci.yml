@@ -69,12 +69,11 @@ jobs:
         name: student-passed-model
         path: MLProject/artifacts/model.pkl
 
-    - name: Build Docker Model
-      working-directory: MLProject
+    - name: Build Docker Image
       run: |
         mlflow models build-docker \
-          -m "runs:/$RUN_ID/rf_model_passed_classifier" \
-          -n ichaaulia/student-passed-classifier:latest
+          -m "runs:/6fc0780513e1408eb4e0aa8e8d9680e1/rf_model_passed_classifier" \
+          -n ichaaulia720/student-passed-classifier:latest
 
     - name: Log in to Docker Hub
       run: echo "${{ secrets.DOCKER_PASSWORD }}" \
