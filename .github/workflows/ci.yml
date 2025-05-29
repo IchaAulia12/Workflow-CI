@@ -1,51 +1,79 @@
+# .github/workflows/ci.yml di repo Workflow-CI
 name: ML CI Workflow
 
 on:
+  workflow_dispatch:
   push:
     paths:
-      - "MLProject/**"
       - ".github/workflows/ci.yml"
-  workflow_dispatch:
+      - "MLProject/**"
 
 jobs:
-  build-and-run-fixed:
+  build:
     runs-on: ubuntu-latest
     env:
-      MLFLOW_TRACKING_URI: ${{ secrets.MLFLOW_TRACKING_URI }}
+      MLFLOW_TRACKING_URI:  ${{ secrets.MLFLOW_TRACKING_URI }}
       MLFLOW_TRACKING_USERNAME: ${{ secrets.MLFLOW_TRACKING_USERNAME }}
       MLFLOW_TRACKING_PASSWORD: ${{ secrets.MLFLOW_TRACKING_PASSWORD }}
 
     steps:
-    - name: Checkout repo
+    # 1) Checkout repo utama (Workflow-CI)
+    - name: Checkout CI repo
       uses: actions/checkout@v3
+      with:
+        # keep default owner/repo dari workflow ini
 
-    - name: Setup Conda
+    # 2) Checkout repo preprocessing ke subfolder `preprocessing/`
+    - name: Checkout preprocessing repo
+      uses: actions/checkout@v3
+      with:
+        repository: IchaAulia12/Eksperimen_SML_Icha-aulia
+        path: preprocessing
+
+    # 3) Setup Conda env untuk MLProject
+    - name: Setup Conda & install deps
       uses: conda-incubator/setup-miniconda@v2
       with:
         environment-file: MLProject/conda.yaml
         activate-environment: mlproject-env
-    - name: Preprocess data
-      run: |
-        mkdir -p processed
-        python automate_Icha-aulia.py data/StudentsPerformance.csv processed/StudentsPerformance_cleaned.csv
 
-    - name: Run MLflow project
+    # 4) Jalankan preprocessing
+    - name: Preprocess data
+      working-directory: preprocessing
       run: |
-        cd MLProject
-        mlflow run . --entry-point main \
-          -P data_path="../processed/StudentsPerformance_cleaned.csv"
-          
+        pip install pandas    # hanya kalau belum ada
+        mkdir -p processed
+        python automate_Icha-aulia.py data/StudentsPerformance.csv \
+              processed/StudentsPerformance_cleaned.csv
+
+    # 5) Run MLflow Project
+    - name: Run MLflow project
+      working-directory: MLProject
+      run: |
+        mlflow run . \
+          --entry-point main \
+          -P data_path="../preprocessing/processed/StudentsPerformance_cleaned.csv"
+
+    # 6) Upload artifact model.pkl
     - name: Upload model artifact
       uses: actions/upload-artifact@v4
       with:
-        name: model
+        name: student-passed-model
         path: MLProject/artifacts/model.pkl
-      continue-on-error: true # Optional: Allows the workflow to continue even if this step fails temporarily
-    - name: Build Docker image
-      run: docker build -t ichaaulia/student-passed-classifier:latest MLProject
+
+    # 7) Build & Push Docker image dengan MLflow‐generated Dockerfile
+    - name: Build Docker via MLflow
+      working-directory: MLProject
+      run: |
+        # Pakai MLflow helper untuk generate Dockerfile & build
+        mlflow models build-docker \
+          -m "runs:/$(mlflow runs list --experiment-id 0 --filter-tag mlflow.runName=baseline_rf_model --output json \
+             | jq -r '.[0].run_id')/rf_model_passed_classifier" \
+          -n ichaaulia/student-passed-classifier:latest
 
     - name: Log in to DockerHub
-      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" \
+            | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-    - name: Push Docker image to DockerHub
+    - name: Push Docker image
       run: docker push ichaaulia/student-passed-classifier:latest
