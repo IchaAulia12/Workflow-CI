@@ -22,12 +22,6 @@ jobs:
     - name: Checkout CI repo
       uses: actions/checkout@v3
 
-    - name: Checkout preprocessing repo
-      uses: actions/checkout@v3
-      with:
-        repository: IchaAulia12/Eksperimen_SML_Icha-aulia
-        path: preprocessing
-
     - name: Set up Python 3.12.7
       uses: actions/setup-python@v5
       with:
@@ -36,7 +30,6 @@ jobs:
     - name: Check Env
       run: |
         echo "MLflow URI: $MLFLOW_TRACKING_URI"
-        echo "Python version:"
         python --version
 
     - name: Install dependencies (Conda)
@@ -47,18 +40,11 @@ jobs:
         auto-activate-base: false
 
     - name: Run mlflow project
-      working-directory: preprocessing
-      run: |
-        pip install pandas  # optional, just in case
-        mkdir -p processed
-        python automate_Icha-aulia.py data/StudentsPerformance.csv processed/StudentsPerformance_cleaned.csv
-
-    - name: Run mlflow project
       working-directory: MLProject
       run: |
         mlflow run . \
           --entry-point main \
-          -P data_path="../preprocessing/processed/StudentsPerformance_cleaned.csv"
+          -P data_path="data/StudentsPerformance_cleaned.csv"
 
     - name: Get latest MLflow run_id
       id: get_run_id
