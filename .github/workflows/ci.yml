@@ -40,8 +40,10 @@ jobs:
         auto-activate-base: false
 
     - name: Run mlflow project
+      shell: bash -l {0}  # penting untuk aktifkan conda
       working-directory: MLProject
       run: |
+        conda activate mlproject-env
         mlflow run . \
           --entry-point main \
           -P data_path="data/StudentsPerformance_cleaned.csv"
